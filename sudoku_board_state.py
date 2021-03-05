@@ -4,11 +4,15 @@ from typing import Tuple, List
 
 class SudokuBoardState:
 
-    def __init__(self, board: np.array, possible_actions_board: list, parent_board: np.array = None, parent_possible_actions_board: list = None):
+    def __init__(self, current_pos: Tuple[int, int], board: np.array, possible_actions_board: list,
+                 parent_board: np.array = None, parent_possible_actions_board: list = None,
+                 action: Tuple[Tuple[int, int], int] = None):
+        self.current_pos = current_pos
         self.board = board
         self.possible_actions_board = possible_actions_board
         self.parent_board = parent_board
         self.parent_possible_actions_board = parent_possible_actions_board
+        self.action = action
 
     def next_state(self, pos: Tuple[int, int], n: int):
         row, column = pos
@@ -22,7 +26,8 @@ class SudokuBoardState:
 
         # Propagate the effect of the assignment
         new_board, new_possible_actions_board = self._propagate(new_board, new_possible_actions_board, (row, column), n)
-        return SudokuBoardState(board=new_board, possible_actions_board=new_possible_actions_board, parent_board=self.board, parent_possible_actions_board=self.possible_actions_board)
+        return SudokuBoardState(current_pos=pos, board=new_board, possible_actions_board=new_possible_actions_board,
+                                parent_board=self.board, parent_possible_actions_board=self.possible_actions_board)
 
     def is_goal_state(self) -> bool:
         for row in range(len(self.board)):
@@ -32,9 +37,36 @@ class SudokuBoardState:
                     return False
         return True
 
-    def possible_actions(self, pos: Tuple[int, int]) -> list:
-        r, c = pos
-        return self.possible_actions_board[r][c]
+    def _find_next_pos(self) -> Tuple[int, int]:
+        # Given our current position, find the next unassigned position (i.e. board[r][c] == 0)
+        row, column = self.current_pos
+
+        # First search remaining elements in current column
+        how_many_elements_left_in_column = len(self.board[0]) - column
+        # If any elements
+        if how_many_elements_left_in_column > 0:
+            for i in range(column, len(self.board[0])):
+                if self.board[row][i] == 0:
+                    return row, i
+
+        # Search normally on the remaining rows
+        how_many_rows_left = len(self.board) - row
+        if how_many_rows_left > 0:
+            for r in range(row + 1, len(self.board)):
+                for c in range(len(self.board[0])):
+                    if self.board[r][c] == 0:
+                        return r, c
+
+        return None
+
+    def possible_actions(self) -> Tuple[Tuple[int, int], list]:
+        next_pos = self._find_next_pos()
+        # If couldn't find a next position then return none as there are no possible actions left
+        if next_pos is None:
+            return None
+
+        r, c = next_pos
+        return (r, c), self.possible_actions_board[r][c]
 
     def _in_box(self, board: np.array, pos: Tuple[int, int], n: int) -> bool:
         r, c = pos
@@ -73,9 +105,11 @@ class SudokuBoardState:
         return False
 
     def _is_valid_pos(self, board: np.array, pos: Tuple[int, int], n: int) -> bool:
-        return not self._in_box(board, pos, n) and not self._in_horizontal(board, pos, n) and not self._in_vertical(board, pos, n)
+        return not self._in_box(board, pos, n) and not self._in_horizontal(board, pos, n) and not self._in_vertical(
+            board, pos, n)
 
-    def _deal_with_1_possible_action(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int]) -> Tuple[np.array, list]:
+    def _deal_with_1_possible_action(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int]) -> \
+    Tuple[np.array, list]:
         new_board = np.copy(board)
         new_possible_actions_board = list.copy(possible_actions_board)
 
@@ -93,7 +127,8 @@ class SudokuBoardState:
             new_possible_actions_board[r][c] = []
             return new_board, new_possible_actions_board
 
-    def _propagate_horizontally(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
+    def _propagate_horizontally(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> \
+    Tuple[np.array, list]:
         new_board = np.copy(board)
         new_possible_actions_board = list.copy(possible_actions_board)
         # Get the row and column of the position
@@ -108,7 +143,9 @@ class SudokuBoardState:
                 new_possible_actions_board[r][i].pop(index_of_n)
                 # If we only have an option for an action, pick that action
                 if len(new_possible_actions_board[r][i]) == 1:
-                    new_board, new_possible_actions_board = self._deal_with_1_possible_action(new_board, new_possible_actions_board, (r, i))
+                    new_board, new_possible_actions_board = self._deal_with_1_possible_action(new_board,
+                                                                                              new_possible_actions_board,
+                                                                                              (r, i))
 
             # If couldn't find n we dont need to do anything
             except ValueError:
@@ -116,7 +153,8 @@ class SudokuBoardState:
 
         return new_board, new_possible_actions_board
 
-    def _propagate_vertically(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
+    def _propagate_vertically(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> \
+    Tuple[np.array, list]:
         new_board = np.copy(board)
         new_possible_actions_board = list.copy(possible_actions_board)
 
@@ -130,7 +168,9 @@ class SudokuBoardState:
                 new_possible_actions_board[i][c].pop(new_possible_actions_board[i][c].index(n))
                 # If we only have an option for an action, pick that action
                 if len(new_possible_actions_board[i][c]) == 1:
-                    new_board, new_possible_actions_board = self._deal_with_1_possible_action(new_board, new_possible_actions_board, (i, c))
+                    new_board, new_possible_actions_board = self._deal_with_1_possible_action(new_board,
+                                                                                              new_possible_actions_board,
+                                                                                              (i, c))
 
             # If couldn't find n we dont need to do anything
             except ValueError:
@@ -146,7 +186,8 @@ class SudokuBoardState:
         else:
             return [6, 7, 8]
 
-    def _propagate_box_wise(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
+    def _propagate_box_wise(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[
+        np.array, list]:
         new_board = np.copy(board)
         new_possible_actions_board = list.copy(possible_actions_board)
 
@@ -163,7 +204,9 @@ class SudokuBoardState:
                     new_possible_actions_board[row][column].pop(new_possible_actions_board[row][column].index(n))
                     # If we only have an option for an action, pick that action
                     if len(new_possible_actions_board[row][column]) == 1:
-                        new_board, possible_actions_board = self._deal_with_1_possible_action(new_board, new_possible_actions_board, (row, column))
+                        new_board, possible_actions_board = self._deal_with_1_possible_action(new_board,
+                                                                                              new_possible_actions_board,
+                                                                                              (row, column))
 
                     break
 
@@ -172,7 +215,8 @@ class SudokuBoardState:
                     pass
         return new_board, new_possible_actions_board
 
-    def _propagate(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
+    def _propagate(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[
+        np.array, list]:
         board, possible_actions_board = self._propagate_horizontally(board, possible_actions_board, pos, n)
         board, possible_actions_board = self._propagate_vertically(board, possible_actions_board, pos, n)
         board, possible_actions_board = self._propagate_box_wise(board, possible_actions_board, pos, n)

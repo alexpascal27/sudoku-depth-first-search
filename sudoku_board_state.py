@@ -1,5 +1,6 @@
 import numpy as np
 from typing import Tuple, List
+import copy
 
 
 class SudokuBoardState:
@@ -16,13 +17,22 @@ class SudokuBoardState:
         print("-------------")
 
         self.current_pos = current_pos
-        self.board = np.copy(board)
-        self.possible_actions_board = list.copy(possible_actions_board)
+        self.board = copy.deepcopy(board)
+        self.possible_actions_board = copy.deepcopy(possible_actions_board)
         self.parent = parent
         self.action = action
 
     def get_possible_actions_board(self):
         return self.possible_actions_board
+
+    def get_current_pos(self):
+        return self.current_pos
+
+    def get_board(self):
+        return self.board
+
+    def get_parent(self):
+        return self.parent
 
     def pop_from_possible_actions_board(self):
         if self.action is None:
@@ -39,12 +49,12 @@ class SudokuBoardState:
     def next_state(self, pos: Tuple[int, int], n: int):
         row, column = pos
 
-        new_board = np.copy(self.board)
-        new_possible_actions_board = list.copy(self.possible_actions_board)
+        new_board = copy.deepcopy(self.board)
+        new_possible_actions_board = copy.deepcopy(self.possible_actions_board)
 
         # Assign the cell we are exploring to the value
         new_board[row][column] = n
-        new_possible_actions_board[row][column].pop(0)
+        new_possible_actions_board[row][column].pop()
 
         # Propagate the effect of the assignment
         new_board, new_possible_actions_board = self._propagate(new_board, new_possible_actions_board, (row, column), n)
@@ -123,8 +133,8 @@ class SudokuBoardState:
             board, pos, n)
 
     def _deal_with_1_possible_action(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int]) -> Tuple[np.array, list]:
-        new_board = np.copy(board)
-        new_possible_actions_board = list.copy(possible_actions_board)
+        new_board = copy.deepcopy(board)
+        new_possible_actions_board = copy.deepcopy(possible_actions_board)
 
         r, c = pos
         only_remaining_option = new_possible_actions_board[r][c][0]
@@ -145,8 +155,8 @@ class SudokuBoardState:
 
     def _propagate_horizontally(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> \
     Tuple[np.array, list]:
-        new_board = np.copy(board)
-        new_possible_actions_board = list.copy(possible_actions_board)
+        new_board = copy.deepcopy(board)
+        new_possible_actions_board = copy.deepcopy(possible_actions_board)
         # Get the row and column of the position
         r, c = pos
         indexes_to_check = [*range(9)]
@@ -174,8 +184,8 @@ class SudokuBoardState:
 
     def _propagate_vertically(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> \
     Tuple[np.array, list]:
-        new_board = np.copy(board)
-        new_possible_actions_board = list.copy(possible_actions_board)
+        new_board = copy.deepcopy(board)
+        new_possible_actions_board = copy.deepcopy(possible_actions_board)
 
         # Get the row and column of the position
         r, c = pos
@@ -185,7 +195,7 @@ class SudokuBoardState:
             try:
                 # If we find n in the array of possible actions, remove it
                 index_of_n = new_possible_actions_board[i][c].index(n)
-                print("Index of " + str(n) + " at position[" + str(pos[0]) + "][" + str(pos[1]) + "]: " + str(index_of_n))
+                #print("Index of " + str(n) + " at position[" + str(pos[0]) + "][" + str(pos[1]) + "]: " + str(index_of_n))
                 new_possible_actions_board[i][c].pop(index_of_n)
                 # If we only have an option for an action, pick that action
                 if len(new_possible_actions_board[i][c]) == 1:
@@ -210,10 +220,9 @@ class SudokuBoardState:
         else:
             return [6, 7, 8]
 
-    def _propagate_box_wise(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[
-        np.array, list]:
-        new_board = np.copy(board)
-        new_possible_actions_board = list.copy(possible_actions_board)
+    def _propagate_box_wise(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
+        new_board = copy.deepcopy(board)
+        new_possible_actions_board = copy.deepcopy(possible_actions_board)
 
         r, c = pos
         range_r = self._find_box_range(r)
@@ -243,8 +252,8 @@ class SudokuBoardState:
         return new_board, new_possible_actions_board
 
     def _propagate(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
-        print("Propagate")
-        self.print_2d_list(possible_actions_board)
+        # print("Propagate")
+        # self.print_2d_list(possible_actions_board)
         new_board, new_possible_actions_board = self._propagate_horizontally(board, possible_actions_board, pos, n)
         new_board, new_possible_actions_board = self._propagate_vertically(new_board, new_possible_actions_board, pos, n)
         new_board, new_possible_actions_board = self._propagate_box_wise(new_board, new_possible_actions_board, pos, n)

@@ -54,6 +54,10 @@ class BoardFunctions:
             board, pos, n, check_current_pos)
 
     def _deal_with_1_possible_action(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int]) -> Tuple[np.array, list]:
+        # If the 1 possible action is on already assigned cell, dont assign it
+        if board[pos[0]][pos[1]] != 0:
+            return board, possible_actions_board
+
         new_board = copy.deepcopy(board)
         new_possible_actions_board = copy.deepcopy(possible_actions_board)
 
@@ -69,18 +73,11 @@ class BoardFunctions:
         self.print_2d_list(new_possible_actions_board)
         print("11111111111111111")
         """
-        # If the 1 possible action is on already assigned cell, dont assign it
-        if new_board[r][c] != 0:
-            return new_board, new_possible_actions_board
 
-        # If the only remaining option is valid, then pick it, otherwise return an unchanged board and empty possible action board
         if self.is_valid_pos(new_board, pos, only_remaining_option, check_current_pos=True):
             new_board[r][c] = only_remaining_option
-            # Propagate the effect of the assignment
-            return self.propagate(new_board, new_possible_actions_board, (r, c), only_remaining_option)
-        # Position is not valid
-        else:
-            return new_board, new_possible_actions_board
+
+        return new_board, new_possible_actions_board
 
     def _propagate_horizontally(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
         new_board = copy.deepcopy(board)

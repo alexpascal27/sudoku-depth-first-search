@@ -22,8 +22,9 @@ class SudokuBoardState:
         self.possible_actions_board = copy.deepcopy(possible_actions_board)
         self.parent = parent
         self.action = action
-
         self.board_functions = BoardFunctions()
+
+        self._deal_with_1_picks()
 
     def get_possible_actions_board(self):
         return self.possible_actions_board
@@ -37,11 +38,14 @@ class SudokuBoardState:
     def get_parent(self):
         return self.parent
 
-    def pop_from_possible_actions_board(self):
-        if self.action is None:
-            return
-        pos, n = self.action
-        self.possible_actions_board[pos[0]][pos[1]].pop()
+    def _deal_with_1_picks(self):
+        for row in range(len(self.board)):
+            for column in range(len(self.board[0])):
+                if (self.board[row][column] != 0) and (len(self.possible_actions_board[row][column]) > 0):
+                    n_options = self.possible_actions_board[row][column]
+                    self.possible_actions_board[row][column] = []
+                    for n in n_options:
+                        self.board_functions.propagate(self.board, self.possible_actions_board, (row, column), n)
 
     def print_2d_list(self, collection: list):
         print("[")

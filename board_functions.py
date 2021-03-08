@@ -116,6 +116,22 @@ class BoardFunctions:
         # self.print_2d_list(possible_actions_board)
         return self._propagate_horizontally(board, possible_actions_board, pos, n)
 
+    def deal_with_1_picks(self, board: np.array, possible_actions_board: list):
+        new_board = copy.deepcopy(board)
+        new_possible_actions_board = copy.deepcopy(possible_actions_board)
+
+        for row in range(len(new_board)):
+            for column in range(len(new_board[0])):
+                # If only one option
+                if (new_board[row][column] == 0) and (len(new_possible_actions_board[row][column]) == 1):
+                    n = new_possible_actions_board[row][column][0]
+                    new_possible_actions_board[row][column] = []
+                    if self.is_valid_pos(new_board, (row, column), n, check_current_pos=True):
+                        new_board[row][column] = n
+                        new_board, new_possible_actions_board = self.propagate(new_board, new_possible_actions_board, (row, column), n)
+
+        return new_board, new_possible_actions_board
+
     def print_2d_list(self, collection: list):
         print("[")
         for i in range(len(collection)):

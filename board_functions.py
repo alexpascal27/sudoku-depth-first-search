@@ -53,32 +53,6 @@ class BoardFunctions:
         return not self._in_box(board, pos, n, check_current_pos) and not self._in_horizontal(board, pos, n, check_current_pos) and not self._in_vertical(
             board, pos, n, check_current_pos)
 
-    def _deal_with_1_possible_action(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int]) -> Tuple[np.array, list]:
-        # If the 1 possible action is on already assigned cell, dont assign it
-        if board[pos[0]][pos[1]] != 0:
-            return board, possible_actions_board
-
-        new_board = copy.deepcopy(board)
-        new_possible_actions_board = copy.deepcopy(possible_actions_board)
-
-        r, c = pos
-        only_remaining_option = new_possible_actions_board[r][c][0]
-        """
-        print("Picked " + str(only_remaining_option) + " for position [" + str(r) + "][" + str(c) + "]")
-        print("111111111111111111")
-        print(pos)
-        print()
-        self.print_2d_list(new_board)
-        print()
-        self.print_2d_list(new_possible_actions_board)
-        print("11111111111111111")
-        """
-
-        if self.is_valid_pos(new_board, pos, only_remaining_option, check_current_pos=True):
-            new_board[r][c] = only_remaining_option
-
-        return new_board, new_possible_actions_board
-
     def _propagate_horizontally(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
         new_board = copy.deepcopy(board)
         new_possible_actions_board = copy.deepcopy(possible_actions_board)
@@ -91,17 +65,9 @@ class BoardFunctions:
                 # If we find n in the array of possible actions, remove it
                 index_of_n = new_possible_actions_board[r][i].index(n)
                 new_possible_actions_board[r][i].pop(index_of_n)
-
             # If couldn't find n we dont need to do anything
             except ValueError:
                 pass
-
-            finally:
-                # If we only have an option for an action, pick that action
-                if len(new_possible_actions_board[r][i]) == 1:
-                    new_board, new_possible_actions_board = self._deal_with_1_possible_action(new_board,
-                                                                                              new_possible_actions_board,
-                                                                                              (r, i))
 
         return self._propagate_vertically(new_board, new_possible_actions_board, pos, n)
 
@@ -123,13 +89,6 @@ class BoardFunctions:
             except ValueError:
                 pass
 
-            finally:
-                # If we only have an option for an action, pick that action
-                if len(new_possible_actions_board[i][c]) == 1:
-                    new_board, new_possible_actions_board = self._deal_with_1_possible_action(new_board,
-                                                                                              new_possible_actions_board,
-                                                                                              (i, c))
-
         return self._propagate_box_wise(new_board, new_possible_actions_board, pos, n)
 
     def _propagate_box_wise(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
@@ -149,13 +108,6 @@ class BoardFunctions:
                 # If couldn't find n we dont need to do anything
                 except ValueError:
                     pass
-
-                finally:
-                    # If we only have an option for an action, pick that action
-                    if len(new_possible_actions_board[row][column]) == 1:
-                        new_board, possible_actions_board = self._deal_with_1_possible_action(new_board,
-                                                                                              new_possible_actions_board,
-                                                                                              (row, column))
 
         return new_board, new_possible_actions_board
 

@@ -9,7 +9,7 @@ class SudokuBoardState:
     def __init__(self, current_pos: Tuple[int, int], board: np.array, possible_actions_board: list,
                  parent=None,
                  action: Tuple[Tuple[int, int], int] = None):
-        print("-------------")
+        print("------BEFORE-------")
         print(current_pos)
         print()
         self.print_2d_list(board)
@@ -26,6 +26,14 @@ class SudokuBoardState:
 
         self._deal_with_1_picks()
 
+        print("-------AFTER------")
+        print(current_pos)
+        print()
+        self.print_2d_list(board)
+        print()
+        self.print_2d_list(possible_actions_board)
+        print("-------------")
+
     def get_possible_actions_board(self):
         return self.possible_actions_board
 
@@ -41,11 +49,13 @@ class SudokuBoardState:
     def _deal_with_1_picks(self):
         for row in range(len(self.board)):
             for column in range(len(self.board[0])):
-                if (self.board[row][column] != 0) and (len(self.possible_actions_board[row][column]) > 0):
-                    n_options = self.possible_actions_board[row][column]
+                # If only one option
+                if (self.board[row][column] == 0) and (len(self.possible_actions_board[row][column]) == 1):
+                    n = self.possible_actions_board[row][column][0]
                     self.possible_actions_board[row][column] = []
-                    for n in n_options:
-                        self.board_functions.propagate(self.board, self.possible_actions_board, (row, column), n)
+                    if self.board_functions.is_valid_pos(self.board, (row, column), n, check_current_pos=True):
+                        self.board[row][column] = n
+                        self.board, self.possible_actions_board = self.board_functions.propagate(self.board, self.possible_actions_board, (row, column), n)
 
     def print_2d_list(self, collection: list):
         print("[")

@@ -50,5 +50,6 @@ class InitialBoardSetup:
                 temp_value = new_board[row][column]
                 if temp_value != 0:
                     new_board, new_possible_actions_board = self.board_functions.propagate(new_board, new_possible_actions_board, (row, column), temp_value)
+                    new_board, new_possible_actions_board = self.board_functions.deal_with_1_picks(new_board, new_possible_actions_board)
         return new_board, new_possible_actions_board
 

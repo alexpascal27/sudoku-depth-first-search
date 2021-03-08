@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Tuple, List
+from typing import Tuple
 from board_functions import BoardFunctions
 import copy
 
@@ -58,6 +58,8 @@ class SudokuBoardState:
 
         # Check for only 1 possible remaining option
         new_board, new_possible_actions_board = self.board_functions.deal_with_1_picks(new_board, new_possible_actions_board)
+
+        self.possible_actions_board[row][column].pop()
 
         return SudokuBoardState(current_pos=pos, board=new_board, possible_actions_board=new_possible_actions_board,
                                 parent=self)

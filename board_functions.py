@@ -132,8 +132,11 @@ class BoardFunctions:
 
         return new_board, new_possible_actions_board
 
-    def print_2d_list(self, collection: list):
+    def print_2d_list(self, collection: list, message: str = ""):
+        print("------START: " + message + "-------")
+        print()
         print("[")
         for i in range(len(collection)):
             print(collection[i])
         print("]")
+        print("------END: " + message + "-------")

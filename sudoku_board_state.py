@@ -6,29 +6,14 @@ import copy
 
 class SudokuBoardState:
 
-    def __init__(self, current_pos: Tuple[int, int], board: np.array, possible_actions_board: list,
-                 parent=None,
-                 action: Tuple[Tuple[int, int], int] = None):
-
+    def __init__(self, current_pos: Tuple[int, int], board: np.array, possible_actions_board: list):
         self.current_pos = current_pos
-        self.board = copy.deepcopy(board)
-        self.possible_actions_board = copy.deepcopy(possible_actions_board)
-        self.parent = parent
-        self.action = action
+        self.board = board
+        self.possible_actions_board = possible_actions_board
         self.board_functions = BoardFunctions()
-
-
-    def get_possible_actions_board(self):
-        return self.possible_actions_board
-
-    def get_current_pos(self):
-        return self.current_pos
 
     def get_board(self):
         return self.board
-
-    def get_parent(self):
-        return self.parent
 
     def next_state(self, pos: Tuple[int, int], n: int):
         row, column = pos
@@ -46,23 +31,26 @@ class SudokuBoardState:
         # Check for only 1 possible remaining option
         new_board, new_possible_actions_board = self.board_functions.deal_with_1_picks(new_board, new_possible_actions_board)
 
-        return SudokuBoardState(current_pos=pos, board=new_board, possible_actions_board=new_possible_actions_board,
-                                parent=self)
+        return SudokuBoardState(current_pos=pos, board=new_board, possible_actions_board=new_possible_actions_board)
 
+    # Could check the entire board or just find the next pos - if returns None then we are goal state
     def is_goal_state(self) -> bool:
-        for row in range(len(self.board)):
-            for column in range(len(self.board[0])):
-                # if free cell, that is the next cell to explore
-                if self.board[row][column] == 0:
-                    return False
-        return True
+        return self._find_next_pos() is None
 
+    # Could check the entire board but instead check from current position since we wont have unassigned cells before current position
     def _find_next_pos(self) -> Tuple[int, int]:
         # Given our current position, find the next unassigned position (i.e. board[r][c] == 0)
         row, column = self.current_pos
 
-        # Search normally on the remaining rows
-        how_many_rows_left = len(self.board) - row
+        # Check columns left in current row
+        how_many_columns_left = len(self.board[0]) - column
+        for c in range(how_many_columns_left):
+            if self.board[row][c+column] == 0:
+                return row, c+column
+
+        # We already searched current row so search normally on the remaining rows
+        how_many_rows_left = len(self.board) - row - 1
+
         if how_many_rows_left > 0:
             for r in range(row, len(self.board)):
                 for c in range(len(self.board[0])):

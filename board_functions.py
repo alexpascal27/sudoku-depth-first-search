@@ -82,7 +82,6 @@ class BoardFunctions:
             try:
                 # If we find n in the array of possible actions, remove it
                 index_of_n = new_possible_actions_board[i][c].index(n)
-                # print("Index of " + str(n) + " at position[" + str(pos[0]) + "][" + str(pos[1]) + "]: " + str(index_of_n))
                 new_possible_actions_board[i][c].pop(index_of_n)
 
             # If couldn't find n we dont need to do anything
@@ -112,8 +111,6 @@ class BoardFunctions:
         return new_board, new_possible_actions_board
 
     def propagate(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
-        # print("Propagate")
-        # self.print_2d_list(possible_actions_board)
         return self._propagate_horizontally(board, possible_actions_board, pos, n)
 
     def deal_with_1_picks(self, board: np.array, possible_actions_board: list):
@@ -131,12 +128,3 @@ class BoardFunctions:
                         new_board, new_possible_actions_board = self.propagate(new_board, new_possible_actions_board, (row, column), n)
 
         return new_board, new_possible_actions_board
-
-    def print_2d_list(self, collection: list, message: str = ""):
-        print("------START: " + message + "-------")
-        print()
-        print("[")
-        for i in range(len(collection)):
-            print(collection[i])
-        print("]")
-        print("------END: " + message + "-------")

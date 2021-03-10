@@ -9,15 +9,6 @@ class SudokuBoardState:
     def __init__(self, current_pos: Tuple[int, int], board: np.array, possible_actions_board: list,
                  parent=None,
                  action: Tuple[Tuple[int, int], int] = None):
-        """
-        print("-------------")
-        print(current_pos)
-        print()
-        self.print_2d_list(board)
-        print()
-        self.print_2d_list(possible_actions_board)
-        print("-------------")
-        """
 
         self.current_pos = current_pos
         self.board = copy.deepcopy(board)
@@ -38,12 +29,6 @@ class SudokuBoardState:
 
     def get_parent(self):
         return self.parent
-
-    def print_2d_list(self, collection: list):
-        print("[")
-        for i in range(len(collection)):
-            print(collection[i])
-        print("]")
 
     def next_state(self, pos: Tuple[int, int], n: int):
         row, column = pos

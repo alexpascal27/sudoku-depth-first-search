@@ -25,7 +25,7 @@ class InitialBoardSetup:
                 # if found a cell that is above 0, we have to check if its position is valid
                 cell_value = self.board[row][column]
                 if cell_value > 0:
-                    if not self.board_functions.is_valid_pos(self.board, (row, column), cell_value, check_current_pos=False):
+                    if not self.board_functions.is_valid_pos(self.board, (row, column), cell_value):
                         return False
         return True
 

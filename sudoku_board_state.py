@@ -9,6 +9,7 @@ class SudokuBoardState:
     def __init__(self, current_pos: Tuple[int, int], board: np.array, possible_actions_board: list,
                  parent=None,
                  action: Tuple[Tuple[int, int], int] = None):
+        """
         print("-------------")
         print(current_pos)
         print()
@@ -16,6 +17,7 @@ class SudokuBoardState:
         print()
         self.print_2d_list(possible_actions_board)
         print("-------------")
+        """
 
         self.current_pos = current_pos
         self.board = copy.deepcopy(board)
@@ -58,8 +60,6 @@ class SudokuBoardState:
 
         # Check for only 1 possible remaining option
         new_board, new_possible_actions_board = self.board_functions.deal_with_1_picks(new_board, new_possible_actions_board)
-
-        self.possible_actions_board[row][column].pop()
 
         return SudokuBoardState(current_pos=pos, board=new_board, possible_actions_board=new_possible_actions_board,
                                 parent=self)

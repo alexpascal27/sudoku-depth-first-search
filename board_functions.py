@@ -13,45 +13,45 @@ class BoardFunctions:
         else:
             return [6, 7, 8]
 
-    def _in_box(self, board: np.array, pos: Tuple[int, int], n: int, check_current_pos: bool) -> bool:
+    def _in_box(self, board: np.array, pos: Tuple[int, int], n: int) -> bool:
         r, c = pos
         range_r = self._find_box_range(r)
         range_c = self._find_box_range(c)
 
         for row in range_r:
             for column in range_c:
-                if not check_current_pos:
+                if row == r and column == c:
                     continue
 
                 if board[row][column] == n:
                     return True
         return False
 
-    def _in_horizontal(self, board: np.array, pos: Tuple[int, int], n: int, check_current_pos: bool) -> bool:
+    def _in_horizontal(self, board: np.array, pos: Tuple[int, int], n: int) -> bool:
         r, c = pos
         # Search entire row
         for column in range(9):
-            if not check_current_pos:
+            if column == c:
                 continue
             # Number is in this row
             if board[r][column] == n:
                 return True
         return False
 
-    def _in_vertical(self, board: np.array, pos: Tuple[int, int], n: int, check_current_pos: bool) -> bool:
+    def _in_vertical(self, board: np.array, pos: Tuple[int, int], n: int) -> bool:
         r, c = pos
         # Search entire column
         for row in range(9):
-            if not check_current_pos:
+            if row == r:
                 continue
             # Number is in this column
             if board[row][c] == n:
                 return True
         return False
 
-    def is_valid_pos(self, board: np.array, pos: Tuple[int, int], n: int, check_current_pos: bool) -> bool:
-        return not self._in_box(board, pos, n, check_current_pos) and not self._in_horizontal(board, pos, n, check_current_pos) and not self._in_vertical(
-            board, pos, n, check_current_pos)
+    def is_valid_pos(self, board: np.array, pos: Tuple[int, int], n: int) -> bool:
+        return not self._in_box(board, pos, n) and not self._in_horizontal(board, pos, n) and not self._in_vertical(
+            board, pos, n)
 
     def _propagate_horizontally(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
         new_board = copy.deepcopy(board)
@@ -126,7 +126,7 @@ class BoardFunctions:
                 if (new_board[row][column] == 0) and (len(new_possible_actions_board[row][column]) == 1):
                     n = new_possible_actions_board[row][column][0]
                     new_possible_actions_board[row][column] = []
-                    if self.is_valid_pos(new_board, (row, column), n, check_current_pos=True):
+                    if self.is_valid_pos(new_board, (row, column), n):
                         new_board[row][column] = n
                         new_board, new_possible_actions_board = self.propagate(new_board, new_possible_actions_board, (row, column), n)
 

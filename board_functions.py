@@ -54,8 +54,8 @@ class BoardFunctions:
             board, pos, n)
 
     def _propagate_horizontally(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
-        new_board = copy.deepcopy(board)
-        new_possible_actions_board = copy.deepcopy(possible_actions_board)
+        new_board = copy.copy(board)
+        new_possible_actions_board = copy.copy(possible_actions_board)
         # Get the row and column of the position
         r, c = pos
         indexes_to_check = [*range(9)]
@@ -72,8 +72,8 @@ class BoardFunctions:
         return self._propagate_vertically(new_board, new_possible_actions_board, pos, n)
 
     def _propagate_vertically(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
-        new_board = copy.deepcopy(board)
-        new_possible_actions_board = copy.deepcopy(possible_actions_board)
+        new_board = copy.copy(board)
+        new_possible_actions_board = copy.copy(possible_actions_board)
 
         # Get the row and column of the position
         r, c = pos
@@ -92,8 +92,8 @@ class BoardFunctions:
         return self._propagate_box_wise(new_board, new_possible_actions_board, pos, n)
 
     def _propagate_box_wise(self, board: np.array, possible_actions_board: list, pos: Tuple[int, int], n: int) -> Tuple[np.array, list]:
-        new_board = copy.deepcopy(board)
-        new_possible_actions_board = copy.deepcopy(possible_actions_board)
+        new_board = copy.copy(board)
+        new_possible_actions_board = copy.copy(possible_actions_board)
 
         r, c = pos
         range_r = self._find_box_range(r)
@@ -117,8 +117,8 @@ class BoardFunctions:
         return self._propagate_horizontally(board, possible_actions_board, pos, n)
 
     def deal_with_1_picks(self, board: np.array, possible_actions_board: list):
-        new_board = copy.deepcopy(board)
-        new_possible_actions_board = copy.deepcopy(possible_actions_board)
+        new_board = copy.copy(board)
+        new_possible_actions_board = copy.copy(possible_actions_board)
 
         for row in range(len(new_board)):
             for column in range(len(new_board[0])):

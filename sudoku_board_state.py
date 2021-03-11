@@ -12,7 +12,7 @@ class SudokuBoardState:
 
         :param current_pos: tuple in form ({row}, {column})
         :param board: numpy array of a n x n int board or grid in range [1..9]
-        :param possible_actions_board: a 3D list such that for each possible_actions_board[{row}][{column}] we get a list of number we can input on the board at that position
+        :param possible_actions_board: a 3D list such that for each possible_actions_board[{row}][{column}] we get a list of numbers we can input on the board at that position
         """
         self.current_pos = current_pos
         self.board = board

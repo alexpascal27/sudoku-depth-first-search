@@ -33,7 +33,8 @@ class SudokuBoardState:
         row, column = pos
 
         # As python is pass by reference we need to copy arrays when we make changes to them so that the original arrays are not changed when the copied arrays are changed
-        new_board = copy.deepcopy(self.board)
+        new_board = copy.copy(self.board)
+        # As possible_actions_board is 3D we need a deep copy for it not to change the original array it copied from
         new_possible_actions_board = copy.deepcopy(self.possible_actions_board)
 
         # Assign the cell we are exploring to the value and make sure we can't pick any other values for that cell anymore

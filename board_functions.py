@@ -4,8 +4,20 @@ import copy
 
 
 class BoardFunctions:
+    """
+    Class that contains common board functions, such as:
+    * checking if a position is valid
+    * propagating the effect of the value of a cell
+    * dealing with cells that have a single option for values to pick
+    """
 
     def _find_box_range(self, i: int) -> List[int]:
+        """
+        Given an index find neighbours for that index
+
+        :param i: either the index of a column or row (irrelevant as board is n x n)
+        :return: list of neighbours around that index
+        """
         if 0 <= i < 3:
             return [0, 1, 2]
         if 3 <= i < 6:
@@ -14,6 +26,15 @@ class BoardFunctions:
             return [6, 7, 8]
 
     def _in_box(self, board: np.array, pos: Tuple[int, int], n: int) -> bool:
+        """
+
+
+        :param board:
+        :param pos:
+        :param n:
+        :return:
+        """
+
         r, c = pos
         range_r = self._find_box_range(r)
         range_c = self._find_box_range(c)
